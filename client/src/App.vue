@@ -11,6 +11,13 @@
         <br>
         <h1><b>RESULT</b></h1>
         <br>
+        <button onclick="window.location.reload();" class="btn btn-outline-success">結果を表示</button>
+        <br>
+        <br>
+        <img :src="require(`@/data/${this.imgName}.png`)" height=250>
+        <br>
+        <br>
+        <p>30秒後を目安に"結果を表示"ボタンを押してみてください</p>
     </div>
 </template>
 
@@ -23,11 +30,17 @@ export default {
     data: function () {
         return {
             name: String,
+            imgName: "output",
         }
     },
     computed: {
         imgSrc() {
-            return require("./data/" + this.name + "_output.png")
+            return require("./data/" + this.imgName + "_output.png")
+        },
+    },
+    methods: {
+        changeImages: function () {
+            this.imgName = "output"
         }
     },
     components: {

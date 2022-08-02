@@ -1,3 +1,8 @@
+import skimage.util
+import skimage.transform
+import skimage.io
+import numpy as np
+import matplotlib.pyplot as plt
 from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.requests import Request
@@ -6,11 +11,6 @@ import random
 
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
-import skimage.io
-import skimage.transform
-import skimage.util
 
 app = FastAPI()
 
@@ -113,6 +113,7 @@ def create_mosaic(p: Path):
     fig = plt.figure()
     plt.imshow(img_M)
     plt.axis("off")
-    path_out = p.path[:-4] + "_output.png"
+    # path_out = p.path[:-4] + "_output.png"
+    path_out = "/tmp/share/output.png"
     fig.savefig(path_out, transparent=True)
     return {"res": "ok", "input_path": p.path, "output_path": path_out}
