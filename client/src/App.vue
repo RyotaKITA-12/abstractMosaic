@@ -33,16 +33,6 @@ export default {
             imgName: "output",
         }
     },
-    computed: {
-        imgSrc() {
-            return require("./data/" + this.imgName + "_output.png")
-        },
-    },
-    methods: {
-        changeImages: function () {
-            this.imgName = "output"
-        }
-    },
     components: {
         HelloWorld,
         Nav

@@ -21,7 +21,7 @@ export default {
                 parallelUploads: 1,
                 maxFiles: 1,
             },
-            name: "sample"
+            name: ""
         }
     },
     components: {
