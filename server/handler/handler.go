@@ -7,12 +7,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Request struct {
 	Path string `json:"path"`
+}
+
+type File struct {
+	Path string `json:"path"`
+	Size int64  `json:"size"`
 }
 
 func Upload(c *gin.Context) {
@@ -34,7 +41,7 @@ func Upload(c *gin.Context) {
 }
 
 func ImgPost(uuid string) {
-    url := "http://app:8008/mosaic/"
+	url := "http://app:8008/mosaic/"
 	request := new(Request)
 	request.Path = "/tmp/share/" + uuid + ".png"
 	req_json, _ := json.Marshal(request)
@@ -52,49 +59,6 @@ func ImgPost(uuid string) {
 	defer res.Body.Close()
 }
 
-// func ImgPost(uuid string) error {
-//     log.Println("img-post")
-// 	url := "http://localhost:8008/mosaic/"
-// 	json := `{"path":"/tmp/share/` + uuid + `.png"}`
-// 	request, err := http.NewRequest(
-// 		"POST",
-// 		url,
-// 		bytes.NewBuffer([]byte(json)),
-// 	)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	request.Header.Set("Content-Type", "application/json")
-//
-// 	client := &http.Client{}
-// 	resp, err := client.Do(request)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer resp.Body.Close()
-//
-// 	return err
-// }
-
-// func ImgPost(uuid string) {
-// 	link := "http://localhost:8008/mosaic/"
-// 	ps := url.Values{}
-// 	ps.Add("path", "/tmp/share/"+uuid+".png")
-// 	fmt.Println(ps.Encode())
-//
-// 	res, err := http.PostForm(link, ps)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-//
-// 	defer res.Body.Close()
-// 	body, _ := io.ReadAll(res.Body)
-//
-// 	log.Println(string(body))
-//
-// }
-
 func Delete(c *gin.Context) {
 	uuid := c.Param("uuid")
 	err := os.Remove(fmt.Sprintf("/tmp/share/%s.png", uuid))
@@ -104,4 +68,32 @@ func Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("id: %s is deleted!", uuid)})
+}
+
+func dirwalk(dir string) (files []File, err error) {
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		path = strings.Replace(path, "images/", "http://localhost:8888/", 1)
+		size := info.Size()
+		f := File{
+			Path: path,
+			Size: size,
+		}
+		files = append(files, f)
+		return nil
+	})
+	if err != nil {
+		return
+	}
+	files = files[2:]
+	return
+}
+
+func List(c *gin.Context) {
+	files, err := dirwalk("/tmp/share")
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, files)
 }

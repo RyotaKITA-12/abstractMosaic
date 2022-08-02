@@ -19,7 +19,9 @@ export default {
                 method: 'post',
                 addRemoveLinks: 'true',
                 parallelUploads: 1,
-            }
+                maxFiles: 1,
+            },
+            name: ""
         }
     },
     components: {
@@ -28,6 +30,7 @@ export default {
     methods: {
         sendingEvent: function (file, xhr, formData) {
             formData.append('uuid', file.upload.uuid)
+            this.$emit('uuid', this.name = file.upload.uuid)
         },
         removeEvent: function (file, error, xhr) {
             axios.delete(`http://localhost:8888/images/${file.upload.uuid}`).then(res => {
@@ -36,7 +39,7 @@ export default {
                 console.error(err)
             })
         }
-    }
+    },
 }
 </script>
 
